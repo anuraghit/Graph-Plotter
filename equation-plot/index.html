@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Equation Grapher</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .left {
+            width: 40%;
+            margin-right: 20px;
+        }
+
+        .right {
+            width: 60%;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.4.4/math.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="left">
+        <h1>Equation Grapher</h1>
+        <p>Enter an equation (e.g., x^2, sin(x)):</p>
+        <input type="text" id="equationInput">
+        <button onclick="addEquation()">Add Equation</button>
+        <button onclick="graphEquations()">Graph</button>
+        <button onclick="resetGraph()">Reset</button>
+    </div>
+    <div class="right">
+        <canvas id="graphCanvas"></canvas>
+    </div>
+
+    <script>
+        const equations = [];
+
+        function addEquation() {
+            const equationInput = document.getElementById("equationInput").value;
+            equations.push(equationInput);
+            document.getElementById("equationInput").value = "";
+        }
+
+        function graphEquations() {
+            const canvas = document.getElementById("graphCanvas");
+            const ctx = canvas.getContext("2d");
+
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Define the range of x-values
+            const xMin = -10;
+            const xMax = 10;
+            const step = 0.1;
+
+            // Calculate the canvas aspect ratio based on the canvas size
+            const aspectRatio = canvas.height / canvas.width;
+
+            // Create a Chart.js chart
+            const chartData = {
+                labels: [],
+                datasets: []
+            };
+
+            const mathParser = math.parser();
+
+            for (let i = 0; i < equations.length; i++) {
+                const equation = equations[i];
+                mathParser.evaluate('f' + i + '(x) = ' + equation);
+
+                const xValues = [];
+                const yValues = [];
+
+                for (let x = xMin; x <= xMax; x += step) {
+                    xValues.push(x);
+                    yValues.push(mathParser.evaluate('f' + i + '(' + x + ')'));
+                }
+
+                chartData.labels = xValues;
+                chartData.datasets.push({
+                    label: 'y' + i + ' = ' + equation,
+                    data: yValues,
+                    borderColor: getRandomColor(),
+                    borderWidth: 2,
+                    fill: false
+                });
+            }
+
+            // Add the circle equation with the center at (0,0) and a radius of 10
+            // const circleRadius = 4;
+            // const circleXValues = [];
+            // const circleYValues = [];
+
+            // for (let x = -circleRadius; x <= circleRadius; x += step) {
+            //     const y = Math.sqrt(circleRadius * circleRadius - x * x);
+            //     circleXValues.push(x);
+            //     circleYValues.push(y);
+            //     circleXValues.push(x);
+            //     circleYValues.push(-y);
+            // }
+
+            // chartData.datasets.push({
+            //     label: 'Circle (x^2 + y^2 = ' + circleRadius * circleRadius + ')',
+            //     data: circleYValues,
+            //     borderColor: getRandomColor(),
+            //     borderWidth: 2,
+            //     fill: false
+            // });
+
+            new Chart(ctx, {
+                type: 'line',
+                data: chartData,
+                options: {
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            min: -10 * aspectRatio, // Double the length of the y-axis
+                            max: 10 * aspectRatio, // Double the length of the y-axis
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            min: -10 * aspectRatio, // Double the length of the y-axis
+                            max: 10 * aspectRatio, // Double the length of the y-axis
+                        }
+                    }
+                }
+            });
+        }
+
+        function resetGraph() {
+    // Clear any previous data
+    circleXValues.length = 0;
+    circleYValues.length = 0;
+    
+    // Clear the chart data
+    chartData.datasets = [];
+
+    // Clear the canvas
+    const canvas = document.getElementById("graphCanvas");
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Redraw the chart if you're using a charting library like Chart.js
+    if (myChart) {
+        myChart.destroy();
+        createChart(); // Replace with your function to recreate the chart
+    }
+}
+
+
+        function getRandomColor() {
+            const letters = "0123456789ABCDEF";
+            let color = "#";
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+    </script>
+</body>
+</html>
